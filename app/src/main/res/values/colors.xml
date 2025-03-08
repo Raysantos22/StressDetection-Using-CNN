@@ -2,12 +2,21 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="bounding_box_color">#234567</color>
 
-    <color name="emotion_highlight">#FF5722</color>
 
     <!-- You likely already have these colors defined -->
     <color name="black_transparent">#99000000</color>
     <color name="gray">#888888</color>
     <color name="orange">#FFA500</color>
+
+    <color name="colorPrimary">#5CBBCB</color>
+    <color name="colorPrimaryDark">#4A9CAC</color>
+    <color name="colorAccent">#FFC107</color>
+    <color name="translucent_white">#80FFFFFF</color>
+    <color name="bounding_box_color">#FFC107</color>
+    <color name="emotion_highlight">#FFC107</color>
+    <color name="background_light">#FFFFF0</color>
+    <color name="text_dark">#000000</color>
+    <color name="text_light">#FFFFFF</color>
+
 </resources>

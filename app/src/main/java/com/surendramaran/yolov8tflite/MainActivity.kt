@@ -1,6 +1,7 @@
 package com.surendramaran.yolov8tflite
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -8,7 +9,7 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.surendramaran.yolov8tflite.Constants.LABELS_PATH
@@ -26,6 +28,7 @@ import com.surendramaran.yolov8tflite.databinding.ActivityMainBinding
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 
 class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeech.OnInitListener {
     private lateinit var binding: ActivityMainBinding
@@ -59,32 +62,51 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        // Debug log to see which emotions we're checking for
-        if (debugMode) {
-            Log.d(TAG, "Emotions to detect: $emotions")
+        try {
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+
+            // Initialize lightweight UI components first
+            setupSignLanguageUI()
+
+            // Initialize Text-to-Speech (lightweight)
+            textToSpeech = TextToSpeech(this, this)
+
+            // Defer heavy initialization
+            binding.root.post {
+                // Initialize camera executor
+                cameraExecutor = Executors.newSingleThreadExecutor()
+
+                // Initialize detector on background thread
+                cameraExecutor.execute {
+                    try {
+                        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error initializing detector", e)
+                    }
+                }
+
+                // Check permissions and setup camera
+                if (allPermissionsGranted()) {
+                    setupCamera()
+                } else {
+                    ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onCreate", e)
+            Toast.makeText(this, "Error initializing app", Toast.LENGTH_LONG).show()
         }
-
-        cameraExecutor = Executors.newSingleThreadExecutor()
-
-        cameraExecutor.execute {
-            detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
-        }
-
-        if (allPermissionsGranted()) {
-            setupCamera()
-        } else {
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }
-
-        // Initialize Text-to-Speech
-        textToSpeech = TextToSpeech(this, this)
-
-        setupSignLanguageUI()
     }
 
+    // Add this to your MainActivity
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Instead of going "back" to home, go back to onboarding
+        startActivity(Intent(this, OnboardingActivity::class.java))
+        finish()
+    }
     private fun setupSignLanguageUI() {
         binding.apply {
             // Start Scanning button
@@ -176,7 +198,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                 currentEmotion = null
 
                 // Update UI
-                currentEmotionText.text = "Emotion: None"
+                currentEmotionText.text = "Emotion:"
 
                 // Reset the emotion icon
                 faceEmotionIcon.setImageResource(android.R.drawable.ic_menu_myplaces)
@@ -189,7 +211,9 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                 if (lastDetectedSign != null && !lastDetectedSign!!.isEmpty()) {
                     captureCurrent()
                 } else {
-                    showCaptureError("No sign detected")
+                    showCaptureError("No sign")
+//                            showCaptureError("No sign detected")
+
                 }
             }
 
@@ -378,21 +402,40 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
     private fun showCaptureConfirmation(message: String) {
         // Show a brief confirmation
         binding.captureConfirmationText.text = "Captured: $message"
-        binding.captureConfirmationText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
+        binding.captureConfirmationText.setTextColor(
+            ContextCompat.getColor(
+                this,
+                android.R.color.holo_green_light
+            )
+        )
         binding.captureConfirmationText.visibility = View.VISIBLE
 
         // Disable capture button during confirmation
-        binding.captureButton.isEnabled = false
-        binding.captureButton.alpha = 0.5f
+        updateButtonState(binding.captureButton, false)
 
         // Hide the confirmation after a delay
         binding.captureConfirmationText.postDelayed({
             binding.captureConfirmationText.visibility = View.INVISIBLE
             if (isScanning) {
-                binding.captureButton.isEnabled = true
-                binding.captureButton.alpha = 1.0f
+                updateButtonState(binding.captureButton, true)
             }
         }, 1500) // 1.5 seconds
+    }
+    private fun updateButtonState(view: View?, enabled: Boolean) {
+        if (view != null) {
+            view.isEnabled = enabled
+
+            // Set alpha on the view itself
+            val alpha = if (enabled) 1.0f else 0.5f
+            view.alpha = alpha
+
+            // Find the parent CardView
+            val parent = view.parent
+            if (parent is CardView) {
+                // Update the alpha of the container too
+                parent.alpha = alpha
+            }
+        }
     }
 
     private fun setupCamera() {
@@ -451,7 +494,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         // Clear any detected signs
         binding.overlay.clear()
         lastDetectedSign = null
-        binding.detectedSignText.text = "No sign detected"
+        binding.detectedSignText.text = "No sign"
     }
 
     private fun bindCameraUseCases() {
@@ -584,7 +627,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                 lastDetectedSign = null
 
                 // Update UI to show no sign detected
-                binding.detectedSignText.text = "No sign detected"
+                binding.detectedSignText.text = "No sign"
             }
         }
     }
@@ -611,7 +654,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                         val emotionDetected = isEmotion(sign)
 
                         // Update UI to show detected sign
-                        binding.detectedSignText.text = "Detected sign: $sign"
+                        binding.detectedSignText.text = "sign: $sign"
 
                         // Highlight if it's an emotion
                         if (emotionDetected) {

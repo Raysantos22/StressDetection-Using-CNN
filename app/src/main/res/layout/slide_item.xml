@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFF0"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/frameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Frame"
+                android:textColor="#5CBBCB"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/logoFrame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/logoImageView"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:contentDescription="Logo"
+                    android:src="@drawable/baseline_sign_language_24"
+                    android:tint="@color/black"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="SIGNIFY"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        app:cardBackgroundColor="#5CBBCB"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/headerTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Breaking communication barriers through technology"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:id="@+id/contentLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/descriptionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="4dp"
+                        android:text="SIGNIFY is a Filipino Sign Language (FSL) recognition application that helps deaf and mute individuals communicate with those who don't understand sign language."
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+            </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator1"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator2"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#80FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator3"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#80FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#FFFFFF"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:text="Next"
+                android:textColor="#000000" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

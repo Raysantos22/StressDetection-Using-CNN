@@ -15,14 +15,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YOLOv8TfLite"
         tools:targetApi="31">
+
+        <!-- OnboardingActivity is now the launcher activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".OnboardingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false">
         </activity>
 
         <uses-native-library

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#5CBBCB">
+    <!-- Add this to the top of your layout, just inside the ConstraintLayout -->
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/topCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFF0"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="30dp">
+
+            <ImageView
+                android:id="@+id/logoImageView"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:contentDescription="Logo"
+                android:src="@drawable/sign"
+                android:tint="#5CBBCB" />
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="SIGNIFY"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottomCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="#5CBBCB"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topCard">
+        <View
+            android:id="@+id/swipeOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <FrameLayout
+                android:id="@+id/contentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator1"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator2"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#80FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/dotIndicator3"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#80FFFFFF"
+                    app:cardCornerRadius="5dp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#FDFDEF"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:text="Next"
+                android:textColor="#000000" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

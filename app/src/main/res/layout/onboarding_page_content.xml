@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/headerTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Breaking communication barriers through technology"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/descriptionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp"
+                android:text="SIGNIFY is a Filipino Sign Language (FSL) recognition application that helps deaf and mute individuals communicate with those who don't understand sign language."
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/contentLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- Bullet points will be added here programmatically -->
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
