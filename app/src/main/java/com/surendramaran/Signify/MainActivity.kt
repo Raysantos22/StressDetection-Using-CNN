@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -51,14 +50,14 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
     // Text-to-speech
     private lateinit var textToSpeech: TextToSpeech
 
-    // List of emotions to detect - IMPORTANT: this must match your actual emotions
+    // List of emotions to detect
     private val emotions = listOf("Masaya", "Galit", "Malungkot", "neutral")
 
     // Current emotion
     private var currentEmotion: String? = null
 
     // For debugging
-    private var debugMode = true
+    private var debugMode = false // Changed to false as app is now working
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +65,10 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         try {
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
+
+            // Hide debug elements
+            binding.debugText.visibility = View.GONE
+            binding.debugControlsSection.visibility = View.GONE
 
             // Initialize lightweight UI components first
             setupSignLanguageUI()
@@ -81,9 +84,17 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                 // Initialize detector on background thread
                 cameraExecutor.execute {
                     try {
+                        // Log the model path and labels path
+                        Log.d(TAG, "Loading model from: $MODEL_PATH")
+                        Log.d(TAG, "Loading labels from: $LABELS_PATH")
+
                         detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
+                        Log.d(TAG, "Detector initialized successfully")
                     } catch (e: Exception) {
                         Log.e(TAG, "Error initializing detector", e)
+                        runOnUiThread {
+                            Toast.makeText(this, "Error initializing detector: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
 
@@ -96,19 +107,26 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
-            Toast.makeText(this, "Error initializing app", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Error initializing app: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    // Add this to your MainActivity
     override fun onBackPressed() {
         super.onBackPressed()
         // Instead of going "back" to home, go back to onboarding
         startActivity(Intent(this, OnboardingActivity::class.java))
         finish()
     }
+
     private fun setupSignLanguageUI() {
         binding.apply {
+            // View All Signs button
+            viewSignsButton.setOnClickListener {
+                // Launch the AllSignsActivity
+                val intent = Intent(this@MainActivity, AllSignsActivity::class.java)
+                startActivity(intent)
+            }
+
             // Start Scanning button
             startScanningButton.setOnClickListener {
                 if (!isScanning) {
@@ -164,9 +182,10 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                     showCaptureError("Nothing to speak")
                 }
             }
+
             spaceButton.setOnClickListener {
                 // Only add space if there's some text and the last character isn't already a space
-                if (capturedLetters.isNotEmpty() && capturedLetters[capturedLetters.length - 1] != ' ') {
+                if (capturedLetters.isNotEmpty() && capturedLetters.lastOrNull() != ' ') {
                     capturedLetters.append(" ")
 
                     // Update UI
@@ -178,6 +197,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                     showCaptureError("Cannot add space")
                 }
             }
+
             // Clear Word button
             clearWordButton.setOnClickListener {
                 // Clear only the word
@@ -208,12 +228,10 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
 
             // Single capture button
             captureButton.setOnClickListener {
-                if (lastDetectedSign != null && !lastDetectedSign!!.isEmpty()) {
+                if (lastDetectedSign != null && lastDetectedSign!!.isNotEmpty()) {
                     captureCurrent()
                 } else {
-                    showCaptureError("No sign")
-//                            showCaptureError("No sign detected")
-
+                    showCaptureError("No sign detected")
                 }
             }
 
@@ -261,7 +279,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         // Re-enable capture after a delay
         binding.captureButton.postDelayed({
             isProcessingCapture = false
-        }, 1000)
+        }, 1000) // 1 second
     }
 
     private fun showCaptureError(message: String) {
@@ -321,6 +339,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         // Visual feedback for successful capture
         showCaptureConfirmation("Sign: $sign")
     }
+
     private fun updateHandSignIcon(sign: String) {
         // Using our custom hand sign icon
         binding.handSignIcon.setImageResource(R.drawable.baseline_sign_language_24)
@@ -353,11 +372,13 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
             speakText(textToSpeak)
         }
     }
+
     // A helper method to check if a string is a single letter or character
     private fun isSingleLetter(str: String): Boolean {
         val trimmed = str.trim()
         return trimmed.length == 1 && trimmed[0].isLetterOrDigit()
     }
+
     private fun speakTextWithEmotion(text: String, emotion: String) {
         when (emotion.trim().lowercase()) {
             "masaya" -> {
@@ -421,6 +442,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
             }
         }, 1500) // 1.5 seconds
     }
+
     private fun updateButtonState(view: View?, enabled: Boolean) {
         if (view != null) {
             view.isEnabled = enabled
@@ -442,25 +464,29 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         // This only sets up the camera but doesn't start analysis
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
+            try {
+                cameraProvider = cameraProviderFuture.get()
 
-            // Setup the preview with the selected camera
-            val cameraSelector = CameraSelector.Builder()
-                .requireLensFacing(if (isFrontCamera) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK)
-                .build()
+                // Setup the preview with the selected camera
+                val cameraSelector = CameraSelector.Builder()
+                    .requireLensFacing(if (isFrontCamera) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK)
+                    .build()
 
-            preview = Preview.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                .build()
+                preview = Preview.Builder()
+                    .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                    .build()
 
-            cameraProvider?.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview
-            )
+                cameraProvider?.unbindAll()
+                cameraProvider?.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview
+                )
 
-            preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-
+                preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+            } catch (e: Exception) {
+                Log.e(TAG, "Camera setup failed", e)
+            }
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -522,34 +548,39 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
         imageAnalyzer?.setAnalyzer(cameraExecutor) { imageProxy ->
             // Only analyze if scanning is enabled
             if (isScanning) {
-                val bitmapBuffer =
-                    Bitmap.createBitmap(
-                        imageProxy.width,
-                        imageProxy.height,
-                        Bitmap.Config.ARGB_8888
-                    )
-                imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
-                imageProxy.close()
-
-                val matrix = Matrix().apply {
-                    postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
-
-                    if (isFrontCamera) {
-                        postScale(
-                            -1f,
-                            1f,
-                            imageProxy.width.toFloat(),
-                            imageProxy.height.toFloat()
+                try {
+                    val bitmapBuffer =
+                        Bitmap.createBitmap(
+                            imageProxy.width,
+                            imageProxy.height,
+                            Bitmap.Config.ARGB_8888
                         )
+                    imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
+
+                    val matrix = Matrix().apply {
+                        postRotate(imageProxy.imageInfo.rotationDegrees.toFloat())
+
+                        if (isFrontCamera) {
+                            postScale(
+                                -1f,
+                                1f,
+                                imageProxy.width.toFloat(),
+                                imageProxy.height.toFloat()
+                            )
+                        }
                     }
+
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        bitmapBuffer, 0, 0, bitmapBuffer.width, bitmapBuffer.height,
+                        matrix, true
+                    )
+
+                    detector?.detect(rotatedBitmap)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error processing image", e)
+                } finally {
+                    imageProxy.close()
                 }
-
-                val rotatedBitmap = Bitmap.createBitmap(
-                    bitmapBuffer, 0, 0, bitmapBuffer.width, bitmapBuffer.height,
-                    matrix, true
-                )
-
-                detector?.detect(rotatedBitmap)
             } else {
                 imageProxy.close()
             }
@@ -654,7 +685,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, TextToSpeec
                         val emotionDetected = isEmotion(sign)
 
                         // Update UI to show detected sign
-                        binding.detectedSignText.text = "sign: $sign"
+                        binding.detectedSignText.text = "sign: $sign (${(topDetection.cnf * 100).toInt()}%)"
 
                         // Highlight if it's an emotion
                         if (emotionDetected) {
