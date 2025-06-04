@@ -1,72 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E8E8E8"
-    tools:context=".OnboardingActivity">
+    android:background="@drawable/gradient_blue_green">
 
+    <!-- Skip Button -->
+    <TextView
+        android:id="@+id/skipButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:text="Skip"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:background="@drawable/skip_button_bg"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- ViewPager2 for swipeable pages -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_above="@+id/bottomSection" />
 
+    <!-- Bottom Section -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/bottomSection"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone">
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_marginBottom="32dp"
+        android:paddingHorizontal="24dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/dotIndicator1"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="4dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="5dp" />
+        <!-- Dot Indicators -->
+        <LinearLayout
+            android:id="@+id/dotContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/dotIndicator2"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="4dp"
-            app:cardBackgroundColor="#80FFFFFF"
-            app:cardCornerRadius="5dp" />
+            <View
+                android:id="@+id/dotIndicator1"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/dot_active"
+                android:layout_marginEnd="8dp" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/dotIndicator3"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="4dp"
-            app:cardBackgroundColor="#80FFFFFF"
-            app:cardCornerRadius="5dp" />
+            <View
+                android:id="@+id/dotIndicator2"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/dot_inactive"
+                android:layout_marginEnd="8dp" />
+
+            <View
+                android:id="@+id/dotIndicator3"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/dot_inactive" />
+
+        </LinearLayout>
+
+        <!-- Page Indicator Text -->
+        <TextView
+            android:id="@+id/pageIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="1 / 3"
+            android:textColor="@color/gray"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Next Button Container -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Next Arrow Button -->
+            <Button
+                android:id="@+id/nextButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:background="@drawable/ic_arrow_forward"
+                android:elevation="4dp" />
+
+            <!-- Start Scanning Button (hidden initially) -->
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Start Scanning"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/button_primary"
+                android:elevation="4dp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#FFFFFF"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:text="Next"
-        android:textColor="#000000"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

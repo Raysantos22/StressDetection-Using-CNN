@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <!-- Content Card -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="16dp">
+
+        <!-- Main Title -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:letterSpacing="0.1"
+            android:lineSpacingExtra="8dp" />
+
+        <!-- Description Text -->
+        <TextView
+            android:id="@+id/descriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titleText"
+            android:layout_marginTop="60dp"
+            android:layout_marginHorizontal="20dp"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:textSize="16sp" />
+
+        <!-- Illustration Container for Page 3 -->
+        <RelativeLayout
+            android:id="@+id/illustrationContainer"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@id/titleText"
+            android:layout_marginTop="40dp"
+            android:visibility="gone">
+
+            <!-- Face Scan Illustration -->
+            <ImageView
+                android:id="@+id/faceScanImage"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:src="@drawable/face" />
+
+            <!-- Analysis Card -->
+            <LinearLayout
+                android:id="@+id/analysisCard"
+                android:layout_width="180dp"
+                android:layout_height="120dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/faceScanImage"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/pink_card_bg"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone"
+                android:elevation="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Analysis\nand\nFeedback:"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:lineSpacingExtra="4dp" />
+
+            </LinearLayout>
+
+            <!-- Decorative Elements -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                android:background="@color/accent_red"
+                android:alpha="0.8" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SIGNIFY"
+rootProject.name = "StressDetection"
 include(":app")

@@ -26,8 +26,37 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- App Title Banner -->
+            <!-- View Signs Button (New) -->
+            <LinearLayout
+                android:id="@+id/topControlsSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="end"
+                android:background="#80000000">
 
+                <androidx.cardview.widget.CardView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#5CBBCB"
+                    app:cardElevation="0dp">
+
+                    <Button
+                        android:id="@+id/viewSignsButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="View All Signs"
+                        android:textSize="12sp"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:background="@android:color/transparent"
+                        android:stateListAnimator="@null"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"/>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
             <!-- Camera Preview Area -->
             <androidx.cardview.widget.CardView
@@ -48,7 +77,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                    <com.surendramaran.yolov8tflite.OverlayView
+                    <com.StressDetection.OverlayView
                         android:id="@+id/overlay"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -66,6 +95,7 @@
                         android:contentDescription="Flip Camera"/>
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -105,7 +135,7 @@
                             android:layout_height="wrap_content"
                             android:text="NONE"
                             android:textColor="#FFFFFF"
-                            android:textSize="16dp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:gravity="center"/>
                     </LinearLayout>
@@ -141,7 +171,7 @@
                             android:layout_height="wrap_content"
                             android:text="NONE"
                             android:textColor="#FFC107"
-                            android:textSize="16dp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:gravity="center"/>
                     </LinearLayout>
@@ -170,14 +200,10 @@
                     android:textSize="18sp" />
             </androidx.cardview.widget.CardView>
 
-            <!-- Detection and Emotion Area -->
-
-
             <!-- Button Area -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:orientation="vertical"
                 android:padding="8dp">
                 <LinearLayout
@@ -224,7 +250,7 @@
                             android:text="CLEAR EMOTION"
                             android:textColor="#000000"
                             android:textStyle="bold"
-                            android:textSize="12dp"
+                            android:textSize="12sp"
                             android:background="@android:color/transparent"
                             android:stateListAnimator="@null"/>
                     </androidx.cardview.widget.CardView>
@@ -253,7 +279,6 @@
                             android:text="SPACE"
                             android:textColor="#000000"
                             android:textStyle="bold"
-
                             android:background="@android:color/transparent"
                             android:stateListAnimator="@null"/>
                     </androidx.cardview.widget.CardView>
@@ -330,9 +355,6 @@
                             android:textStyle="bold" />
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
-
-                <!-- Clear Word & Clear Emotion Buttons (Optional Row) -->
-
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -382,9 +404,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- Keep these for compatibility -->
+    <TextView
+        android:id="@+id/debugText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/toggleDebugButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/modelInfoButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/inferenceTimeDisplay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <!-- Other hidden elements for compatibility -->
     <LinearLayout
         android:id="@+id/cameraControlsPanel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/debugControlsSection"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"

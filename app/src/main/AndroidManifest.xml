@@ -3,23 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/skip_button_bg"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/skip_button_bg"
         android:supportsRtl="true"
-        android:theme="@style/Theme.YOLOv8TfLite"
+        android:theme="@style/Theme.StressDetection"
         tools:targetApi="31">
-
-        <!-- OnboardingActivity is now the launcher activity -->
         <activity
             android:name=".OnboardingActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,13 +27,20 @@
         </activity>
 
         <activity
+            android:name=".LauncherActivity"
+            android:exported="false"
+
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- OnboardingActivity is now the launcher activity -->
+
+        <activity
             android:name=".MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
 
         <uses-native-library
             android:name="libOpenCL.so"
-            android:required="false"/>
+            android:required="false" />
         <uses-native-library
             android:name="libOpenCL-pixel.so"
             android:required="false" />
