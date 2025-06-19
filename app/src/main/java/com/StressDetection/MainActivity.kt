@@ -564,17 +564,17 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
     }
 
     private fun updateFaceGuide(boundingBox: BoundingBox) {
-        val faceRect = RectF(
-            boundingBox.x1 * binding.overlay.width,
-            boundingBox.y1 * binding.overlay.height,
-            boundingBox.x2 * binding.overlay.width,
-            boundingBox.y2 * binding.overlay.height
-        )
-
-        val faceSize = (faceRect.width() + faceRect.height()) / 2f
-        val isFaceInGuide = binding.faceGuide.checkFaceInGuide(faceRect)
-
-        binding.faceGuide.updateFaceStatus(true, isFaceInGuide, faceSize)
+//        val faceRect = RectF(
+//            boundingBox.x1 * binding.overlay.width,
+//            boundingBox.y1 * binding.overlay.height,
+//            boundingBox.x2 * binding.overlay.width,
+//            boundingBox.y2 * binding.overlay.height
+//        )
+//
+//        val faceSize = (faceRect.width() + faceRect.height()) / 2f
+//        val isFaceInGuide = binding.faceGuide.checkFaceInGuide(faceRect)
+//
+//        binding.faceGuide.updateFaceStatus(true, isFaceInGuide, faceSize)
     }
 
     override fun onLandmarksDetected(landmarks: FaceLandmarks?) {
