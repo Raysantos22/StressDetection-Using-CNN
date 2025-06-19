@@ -5,12 +5,13 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -91,7 +92,6 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
         binding.apply {
             stressLevel.text = "Stress Level: Monitoring..."
             stressIndicator.text = "📊 Position your face in camera"
-            stressDetails.text = "Point camera at your face to begin analysis"
             captureButton.isEnabled = false
             resumeButton.visibility = View.GONE
         }
@@ -100,8 +100,7 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
     private fun resetStressDisplay() {
         binding.apply {
             stressLevel.text = "Stress Level: No face detected"
-            stressIndicator.text = "❌ No detection"
-            stressDetails.text = "Please position your face in the camera view"
+            stressIndicator.text = "❌ Position your face in the camera view"
             stressIndicatorBackground.setBackgroundColor(
                 ContextCompat.getColor(this@MainActivity, android.R.color.darker_gray)
             )
@@ -119,16 +118,8 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
                 startCaptureSequence()
             }
 
-            resetButton.setOnClickListener {
-                resetAnalysis()
-            }
-
             resumeButton.setOnClickListener {
                 resumeCamera()
-            }
-
-            viewResultsButton.setOnClickListener {
-                showDetailedResults()
             }
         }
     }
@@ -170,8 +161,8 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
     private fun finalizeCaptureAnalysis() {
         if (!isCapturing) return
 
-        // Stop camera
-        pauseCamera()
+        // COMPLETELY stop camera to save resources
+        stopCameraCompletely()
 
         // Get final analysis
         val stressData = stressAnalyzer.calculateStressLevel()
@@ -191,39 +182,81 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
             captureStatus.visibility = View.GONE
             captureButton.isEnabled = false
             resumeButton.visibility = View.VISIBLE
-            viewResultsButton.visibility = View.VISIBLE
+            faceGuide.visibility = View.GONE // Hide guide when showing results
 
             // Show immediate results
             stressLevel.text = "Captured! Stress Level: ${getStressLevelText(stressData.level)} (${stressData.score}/100)"
             stressIndicator.text = "📸 Analysis Complete - ${getStressEmoji(stressData.level)}"
         }
 
-        // Auto-show results
+        // Auto-show results with captured image
         showCaptureResults()
+    }
+
+    private fun stopCameraCompletely() {
+        try {
+            // Stop image analysis
+            imageAnalyzer?.clearAnalyzer()
+
+            // Unbind all camera use cases to completely stop camera
+            cameraProvider?.unbindAll()
+
+            // Clear preview surface
+            preview?.setSurfaceProvider(null)
+
+            isCameraPaused = true
+            binding.viewFinder.alpha = 0.5f // Dim the camera view
+
+            Log.d(TAG, "Camera stopped completely to save resources")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error stopping camera", e)
+        }
+    }
+
+    private fun restartCameraCompletely() {
+        try {
+            isCameraPaused = false
+
+            // Re-bind camera use cases
+            bindCameraUseCases()
+
+            binding.apply {
+                viewFinder.alpha = 1.0f
+                faceGuide.visibility = View.VISIBLE // Show guide again
+            }
+
+            Log.d(TAG, "Camera restarted")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error restarting camera", e)
+        }
     }
 
     private fun pauseCamera() {
         isCameraPaused = true
         imageAnalyzer?.clearAnalyzer()
         binding.viewFinder.alpha = 0.7f // Dim the camera view
+        stopCameraCompletely()
+
     }
 
     private fun resumeCamera() {
-        isCameraPaused = false
+        // Completely restart camera
+        restartCameraCompletely()
+
         isCapturing = false
         captureResult = null
 
         binding.apply {
             resumeButton.visibility = View.GONE
-            viewResultsButton.visibility = View.GONE
             captureButton.isEnabled = true
-            viewFinder.alpha = 1.0f
         }
 
-        // Restart image analysis
-        setupImageAnalyzer()
-        resetAnalysis()
+        setupStressLevelDisplay()
     }
+
+//    private fun pauseCamera() {
+//        // This method kept for compatibility but now calls complete stop
+//    }
 
     private fun setupImageAnalyzer() {
         imageAnalyzer?.setAnalyzer(cameraExecutor) { imageProxy ->
@@ -263,35 +296,171 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
     private fun showCaptureResults() {
         val result = captureResult ?: return
 
-        val timeString = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(result.timestamp))
+        // Create visual annotated image
+        val visualAnalyzer = VisualResultAnalyzer()
+        val annotatedBitmap = result.bitmap?.let { bitmap ->
+            visualAnalyzer.createAnnotatedResult(bitmap, result.stressAnalysis, result.landmarks)
+        }
+
+        // Create custom dialog
+        val dialogView = layoutInflater.inflate(R.layout.dialog_visual_result, null)
+
+        // Setup dialog content
+        setupDialogContent(dialogView, result, annotatedBitmap)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("📊 Stress Analysis Results - $timeString")
-            .setMessage(result.detailedAnalysis)
-            .setPositiveButton("Save Results") { _, _ ->
-                saveResults(result)
+            .setView(dialogView)
+            .setCancelable(true)
+            .setOnCancelListener {
+                autoResetAndResume()
             }
-            .setNeutralButton("Share") { _, _ ->
-                shareResults(result)
-            }
-            .setNegativeButton("Close", null)
             .create()
 
+        // Setup dialog buttons
+        setupDialogButtons(dialogView, result, dialog)
+
         dialog.show()
+
+        // Make dialog take most of screen
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
     }
 
-    private fun showDetailedResults() {
-        showCaptureResults()
+    private fun setupDialogContent(
+        dialogView: View,
+        result: CaptureResult,
+        annotatedBitmap: Bitmap?
+    ) {
+        val timeString = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(result.timestamp))
+
+        // Set timestamp
+        dialogView.findViewById<TextView>(R.id.dialogTimestamp).text = "Captured at $timeString"
+
+        // Set annotated image
+        val annotatedImageView = dialogView.findViewById<ImageView>(R.id.annotatedImage)
+        if (annotatedBitmap != null) {
+            annotatedImageView.setImageBitmap(annotatedBitmap)
+        } else {
+            // Fallback to original image
+            result.bitmap?.let { annotatedImageView.setImageBitmap(it) }
+        }
+
+        // Set stress level container color and content
+        val stressContainer = dialogView.findViewById<LinearLayout>(R.id.stressLevelContainer)
+        val stressEmoji = dialogView.findViewById<TextView>(R.id.stressEmoji)
+        val stressLevelText = dialogView.findViewById<TextView>(R.id.stressLevelText)
+        val stressScore = dialogView.findViewById<TextView>(R.id.stressScore)
+
+        val containerColor = when (result.stressAnalysis.level) {
+            1 -> ContextCompat.getColor(this, android.R.color.holo_green_dark)
+            2 -> ContextCompat.getColor(this, android.R.color.holo_orange_dark)
+            3 -> ContextCompat.getColor(this, android.R.color.holo_red_dark)
+            else -> ContextCompat.getColor(this, android.R.color.darker_gray)
+        }
+
+        stressContainer.setBackgroundColor(containerColor)
+        stressEmoji.text = getStressEmoji(result.stressAnalysis.level)
+        stressLevelText.text = "LEVEL ${result.stressAnalysis.level}: ${getStressLevelText(result.stressAnalysis.level).uppercase()} STRESS"
+        stressScore.text = "Score: ${result.stressAnalysis.score}/100 points"
+
+        // Set breakdown
+        val emotionBreakdown = dialogView.findViewById<TextView>(R.id.emotionBreakdown)
+        emotionBreakdown.text = buildString {
+            append("🎭 Emotions: ${result.stressAnalysis.emotionScore}/60 pts (${result.stressAnalysis.dominantEmotion})\n")
+            append("😤 Facial Tension: ${result.stressAnalysis.facialTensionScore}/25 pts\n")
+            append("👁️ Eye Strain: ${result.stressAnalysis.eyeFatigueScore}/15 pts")
+        }
+
+        // Set confidence
+        val confidenceLevel = dialogView.findViewById<TextView>(R.id.confidenceLevel)
+        confidenceLevel.text = "📈 Analysis Confidence: ${getReliabilityScore()}%"
+
+        // Set explanation
+        val explanationText = dialogView.findViewById<TextView>(R.id.explanationText)
+        explanationText.text = getStressExplanation(result.stressAnalysis)
+    }
+
+    private fun setupDialogButtons(dialogView: View, result: CaptureResult, dialog: AlertDialog) {
+        val saveButton = dialogView.findViewById<Button>(R.id.saveResultButton)
+        val takeAnotherButton = dialogView.findViewById<Button>(R.id.takeAnotherButton)
+
+        saveButton.setOnClickListener {
+            saveResults(result)
+            dialog.dismiss()
+            autoResetAndResume()
+        }
+
+        takeAnotherButton.setOnClickListener {
+            dialog.dismiss()
+            autoResetAndResume()
+        }
+    }
+
+    private fun getStressExplanation(stressData: StressAnalysisResult): String {
+        return buildString {
+            when (stressData.level) {
+                1 -> {
+                    append("✅ LOW STRESS (0-30 points) detected because:\n\n")
+                    if (stressData.dominantEmotion == "Happy") {
+                        append("😊 Happy emotions reduce stress significantly\n")
+                    }
+                    append("• Facial muscles appear relaxed\n")
+                    append("• Eyes show normal openness and alertness\n")
+                    append("• Minimal tension in eyebrows and mouth area\n")
+                    append("• Stable emotional state detected\n\n")
+                    append("Keep doing what you're doing! 🌟")
+                }
+                2 -> {
+                    append("⚠️ MODERATE STRESS (31-70 points) detected because:\n\n")
+                    if (stressData.emotionScore > 25) {
+                        append("🎭 Stress emotions detected: ${stressData.dominantEmotion}\n")
+                    }
+                    if (stressData.facialTensionScore > 10) {
+                        append("😤 Facial tension observed in multiple areas\n")
+                    }
+                    if (stressData.eyeFatigueScore > 5) {
+                        append("👁️ Eyes showing signs of strain or fatigue\n")
+                    }
+                    append("• Some muscle tension in face detected\n")
+                    append("• Emotional state indicates worry/anxiety\n\n")
+                    append("💡 Take a short break and practice deep breathing")
+                }
+                3 -> {
+                    append("🚨 HIGH STRESS (71+ points) detected because:\n\n")
+                    if (stressData.emotionScore > 35) {
+                        append("😰 Strong stress emotions: ${stressData.dominantEmotion}\n")
+                    }
+                    if (stressData.facialTensionScore > 15) {
+                        append("😬 Significant facial tension across multiple regions\n")
+                    }
+                    if (stressData.eyeFatigueScore > 8) {
+                        append("😵 Eyes showing high fatigue or severe strain\n")
+                    }
+                    append("• Multiple stress indicators present\n")
+                    append("• Facial muscles show high tension\n")
+                    append("• Emotional state indicates distress\n\n")
+                    append("🚨 IMMEDIATE ACTION: Step away from stressful activities!\n")
+                    append("Try 4-7-8 breathing: Inhale 4, hold 7, exhale 8")
+                }
+                else -> {
+                    append("📊 Unable to determine stress level clearly.\n")
+                    append("Try capturing again with better lighting and positioning.")
+                }
+            }
+        }
+    }
+
+    private fun autoResetAndResume() {
+        // Reset everything and resume camera automatically
+        resetAnalysis()
+        resumeCamera()
     }
 
     private fun saveResults(result: CaptureResult) {
         // Here you could implement saving to file or database
-        Toast.makeText(this, "Results saved successfully!", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun shareResults(result: CaptureResult) {
-        // Here you could implement sharing functionality
-        Toast.makeText(this, "Sharing functionality not implemented yet", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Result saved!", Toast.LENGTH_SHORT).show()
     }
 
     private fun resetAnalysis() {
@@ -300,8 +469,6 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
         currentLandmarks = null
 
         binding.apply {
-            viewResultsButton.visibility = View.GONE
-            setupStressLevelDisplay()
             overlay.clear()
         }
     }
@@ -378,14 +545,36 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
             }
 
             if (boundingBoxes.isNotEmpty()) {
+                val boundingBox = boundingBoxes[0]
+
+                // Update face guide
+                updateFaceGuide(boundingBox)
+
                 val emotions = boundingBoxes.map { it.clsName to it.cnf }
                 stressAnalyzer.updateEmotions(emotions)
 
                 if (!isCameraPaused) {
                     updateStressDisplay()
                 }
+            } else {
+                // No face detected
+                binding.faceGuide.updateFaceStatus(false, false, 0f)
             }
         }
+    }
+
+    private fun updateFaceGuide(boundingBox: BoundingBox) {
+        val faceRect = RectF(
+            boundingBox.x1 * binding.overlay.width,
+            boundingBox.y1 * binding.overlay.height,
+            boundingBox.x2 * binding.overlay.width,
+            boundingBox.y2 * binding.overlay.height
+        )
+
+        val faceSize = (faceRect.width() + faceRect.height()) / 2f
+        val isFaceInGuide = binding.faceGuide.checkFaceInGuide(faceRect)
+
+        binding.faceGuide.updateFaceStatus(true, isFaceInGuide, faceSize)
     }
 
     override fun onLandmarksDetected(landmarks: FaceLandmarks?) {
@@ -412,14 +601,6 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
 
             val color = getStressColor(stressData.level)
             stressIndicatorBackground.setBackgroundColor(color)
-
-            stressDetails.text = buildString {
-                append("📊 Emotion Impact: ${stressData.emotionScore}/40\n")
-                append("😤 Facial Tension: ${stressData.facialTensionScore}/30\n")
-                append("👁️ Eye Fatigue: ${stressData.eyeFatigueScore}/30\n")
-                append("🎭 Primary Emotion: ${stressData.dominantEmotion}\n")
-                append("📈 Confidence: ${getReliabilityScore()}%")
-            }
 
             // Enable capture button only when face is detected and not capturing
             captureButton.isEnabled = !isCapturing && !isCameraPaused && stressData.level > 0

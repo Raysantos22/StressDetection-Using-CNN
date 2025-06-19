@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#CC000000"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E1E1E"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📊 Your Stress Analysis Results"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/dialogTimestamp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Captured at 14:30:25"
+                android:textAlignment="center"
+                android:textColor="#CCFFFFFF"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Annotated Image Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2E2E2E"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📸 Visual Analysis"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <ImageView
+                android:id="@+id/annotatedImage"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                android:background="#444444"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👆 Arrows show stress indicators detected in your face"
+                android:textAlignment="center"
+                android:textColor="#AAFFFFFF"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Results Summary -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2E2E2E"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📊 Stress Level Analysis"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Stress Level Display -->
+            <LinearLayout
+                android:id="@+id/stressLevelContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#4CAF50"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/stressEmoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="😌"
+                    android:textSize="30sp"
+                    android:layout_marginEnd="12dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/stressLevelText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="LEVEL 1: LOW STRESS"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/stressScore"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Score: 18/100 points"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Detailed Breakdown -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📋 Detailed Breakdown:"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/emotionBreakdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🎭 Emotions: 5/60 pts (Happy)\n😤 Facial Tension: 8/25 pts\n👁️ Eye Strain: 5/15 pts"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/confidenceLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📈 Analysis Confidence: 87%"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Why This Result Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2E2E2E"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="❓ Why This Result?"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/explanationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="✅ LOW STRESS detected because:\n\n😊 Happy emotions reduce stress significantly\n• Facial muscles appear relaxed\n• Eyes show normal openness\n• Minimal tension detected\n\nKeep doing what you're doing! 🌟"
+                android:textColor="#CCFFFFFF"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/saveResultButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="#FF9800"
+                android:text="💾 Save Result"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/takeAnotherButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="#4CAF50"
+                android:text="📸 Take Another"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

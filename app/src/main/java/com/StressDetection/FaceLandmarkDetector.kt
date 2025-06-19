@@ -70,13 +70,20 @@ class FaceLandmarkDetector(
         val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)
         val rightEyeContour = face.getContour(FaceContour.RIGHT_EYE)
 
-        // Calculate metrics
+        // Calculate enhanced metrics
         val leftEyeOpenness = calculateEyeOpenness(face, true)
         val rightEyeOpenness = calculateEyeOpenness(face, false)
         val eyebrowTension = calculateEyebrowTension(face, leftEyebrowTop, rightEyebrowTop, leftEye, rightEye)
         val eyeBagSeverity = estimateEyeBags(face, leftEyeContour, rightEyeContour)
         val mouthTension = calculateMouthTension(face, leftMouth, rightMouth, bottomMouth)
         val overallTension = calculateOverallTension(face)
+
+        // NEW: Additional stress indicators
+        val foreheadWrinkles = calculateForeheadWrinkles(face, leftEyebrowTop, rightEyebrowTop)
+        val jawTension = calculateJawTension(face, faceContour)
+        val darkCircles = estimateDarkCircles(face, leftEyeContour, rightEyeContour)
+        val skinStress = calculateSkinStressIndicators(face)
+        val facialAsymmetry = calculateFacialAsymmetry(face)
 
         // Convert landmark positions to normalized coordinates (0-1)
         val normalizedLandmarks = mutableMapOf<String, PointF>()
@@ -114,6 +121,14 @@ class FaceLandmarkDetector(
             }
         }
 
+        // Add cheek points for additional analysis
+        leftCheek?.let {
+            normalizedLandmarks["LEFT_CHEEK"] = PointF(it.position.x / imageWidth, it.position.y / imageHeight)
+        }
+        rightCheek?.let {
+            normalizedLandmarks["RIGHT_CHEEK"] = PointF(it.position.x / imageWidth, it.position.y / imageHeight)
+        }
+
         return FaceLandmarks(
             leftEyeOpenness = leftEyeOpenness,
             rightEyeOpenness = rightEyeOpenness,
@@ -121,7 +136,13 @@ class FaceLandmarkDetector(
             eyeBagSeverity = eyeBagSeverity,
             mouthTension = mouthTension,
             overallFacialTension = overallTension,
-            landmarkPoints = normalizedLandmarks
+            landmarkPoints = normalizedLandmarks,
+            // NEW: Enhanced stress indicators
+            foreheadWrinkles = foreheadWrinkles,
+            jawTension = jawTension,
+            darkCircles = darkCircles,
+            skinStress = skinStress,
+            facialAsymmetry = facialAsymmetry
         )
     }
 
@@ -139,8 +160,10 @@ class FaceLandmarkDetector(
         rightEye: FaceLandmark?
     ): Float {
         return try {
+            var tensionScore = 0f
+
+            // Method 1: Distance between eyebrows and eyes
             if (leftEyebrowTop != null && rightEyebrowTop != null && leftEye != null && rightEye != null) {
-                // Calculate distance between eyebrows and eyes
                 val leftEyebrowPoints = leftEyebrowTop.points
                 val rightEyebrowPoints = rightEyebrowTop.points
 
@@ -152,18 +175,38 @@ class FaceLandmarkDetector(
                     val rightDistance = abs(rightEyebrowCenter.y - rightEye.position.y)
                     val avgDistance = (leftDistance + rightDistance) / 2f
 
-                    // Normalize tension (smaller distance = more tension)
-                    val normalizedTension = 1f - (avgDistance / 60f) // 60px as reference
-                    return maxOf(0f, minOf(1f, normalizedTension))
+                    // Closer eyebrows to eyes = more tension
+                    val normalizedTension = 1f - (avgDistance / 50f) // 50px as reference
+                    tensionScore += maxOf(0f, minOf(1f, normalizedTension)) * 0.6f
                 }
             }
 
-            // Fallback: use eye openness
+            // Method 2: Eye openness as tension indicator
             val leftEyeOpen = face.leftEyeOpenProbability ?: 0.5f
             val rightEyeOpen = face.rightEyeOpenProbability ?: 0.5f
             val avgEyeOpen = (leftEyeOpen + rightEyeOpen) / 2f
 
-            maxOf(0f, (0.7f - avgEyeOpen) * 2f)
+            // Squinting indicates eyebrow tension
+            if (avgEyeOpen < 0.7f) {
+                tensionScore += (0.7f - avgEyeOpen) * 0.4f
+            }
+
+            // Method 3: Head pose indicating concentration/stress
+            val headY = abs(face.headEulerAngleY)
+            val headX = abs(face.headEulerAngleX)
+
+            // Forward head posture or tilted head can indicate tension
+            if (headX > 10f || headY > 20f) {
+                tensionScore += 0.2f
+            }
+
+            // Method 4: Eye asymmetry (one eyebrow more tense)
+            val eyeAsymmetry = abs(leftEyeOpen - rightEyeOpen)
+            if (eyeAsymmetry > 0.2f) {
+                tensionScore += eyeAsymmetry * 0.3f
+            }
+
+            return maxOf(0f, minOf(1f, tensionScore))
         } catch (e: Exception) {
             Log.e("FaceLandmark", "Error calculating eyebrow tension", e)
             0f
@@ -172,23 +215,45 @@ class FaceLandmarkDetector(
 
     private fun estimateEyeBags(face: Face, leftEyeContour: FaceContour?, rightEyeContour: FaceContour?): Float {
         return try {
+            // Enhanced eye bag detection
+            val leftEyeOpen = face.leftEyeOpenProbability ?: 0.5f
+            val rightEyeOpen = face.rightEyeOpenProbability ?: 0.5f
+            val avgEyeOpen = (leftEyeOpen + rightEyeOpen) / 2f
+
+            // Lower eye openness combined with other factors
+            var eyeBagScore = 0f
+
+            // Factor 1: Reduced eye openness (fatigue indicator)
+            if (avgEyeOpen < 0.6f) {
+                eyeBagScore += (0.6f - avgEyeOpen) * 2f
+            }
+
+            // Factor 2: Eye asymmetry (one eye more tired)
+            val eyeAsymmetry = kotlin.math.abs(leftEyeOpen - rightEyeOpen)
+            if (eyeAsymmetry > 0.15f) {
+                eyeBagScore += eyeAsymmetry * 1.5f
+            }
+
+            // Factor 3: Head pose (tired posture)
+            val headY = face.headEulerAngleY
+            val headZ = face.headEulerAngleZ
+            if (kotlin.math.abs(headY) > 15f || kotlin.math.abs(headZ) > 10f) {
+                eyeBagScore += 0.2f
+            }
+
+            // Factor 4: Eye contour analysis if available
             if (leftEyeContour != null && rightEyeContour != null) {
-                // Analyze eye contour shape for bags
-                val leftPoints = leftEyeContour.points
-                val rightPoints = rightEyeContour.points
+                val leftHeight = calculateEyeHeight(leftEyeContour.points)
+                val rightHeight = calculateEyeHeight(rightEyeContour.points)
+                val avgHeight = (leftHeight + rightHeight) / 2f
 
-                if (leftPoints.size >= 6 && rightPoints.size >= 6) {
-                    // Calculate eye shape irregularity (simplified)
-                    val leftHeight = calculateEyeHeight(leftPoints)
-                    val rightHeight = calculateEyeHeight(rightPoints)
-                    val avgHeight = (leftHeight + rightHeight) / 2f
-
-                    // Lower height ratio might indicate bags/fatigue
-                    val heightRatio = avgHeight / 20f // 20px as reference height
-                    return maxOf(0f, minOf(1f, 1f - heightRatio))
+                // Lower height ratio indicates puffiness/bags
+                if (avgHeight < 15f) {
+                    eyeBagScore += (15f - avgHeight) / 15f * 0.3f
                 }
             }
-            0.2f // Default slight value
+
+            return kotlin.math.max(0f, kotlin.math.min(1f, eyeBagScore))
         } catch (e: Exception) {
             Log.e("FaceLandmark", "Error estimating eye bags", e)
             0f
@@ -239,6 +304,212 @@ class FaceLandmarkDetector(
         val headTension = (abs(headY) + abs(headZ)) / 90f // Normalize to 0-1
 
         return minOf(1f, (eyeTension * 0.7f + headTension * 0.3f))
+    }
+
+    // NEW: Enhanced facial stress indicators
+    private fun calculateForeheadWrinkles(face: Face, leftEyebrowTop: FaceContour?, rightEyebrowTop: FaceContour?): Float {
+        return try {
+            var wrinkleScore = 0f
+
+            // Method 1: Eyebrow position analysis
+            if (leftEyebrowTop != null && rightEyebrowTop != null) {
+                val leftPoints = leftEyebrowTop.points
+                val rightPoints = rightEyebrowTop.points
+
+                if (leftPoints.size >= 3 && rightPoints.size >= 3) {
+                    // Analyze eyebrow curvature for wrinkle detection
+                    val leftCurvature = calculateEyebrowCurvature(leftPoints)
+                    val rightCurvature = calculateEyebrowCurvature(rightPoints)
+                    val avgCurvature = (leftCurvature + rightCurvature) / 2f
+
+                    // Higher curvature indicates furrowed brow
+                    wrinkleScore += avgCurvature * 0.6f
+                }
+            }
+
+            // Method 2: Head pose indicating concentration/stress
+            val headX = abs(face.headEulerAngleX)
+            if (headX > 5f) { // Forward head lean
+                wrinkleScore += (headX / 30f) * 0.4f
+            }
+
+            maxOf(0f, minOf(1f, wrinkleScore))
+        } catch (e: Exception) {
+            Log.e("FaceLandmark", "Error calculating forehead wrinkles", e)
+            0f
+        }
+    }
+
+    private fun calculateEyebrowCurvature(eyebrowPoints: List<PointF>): Float {
+        if (eyebrowPoints.size < 3) return 0f
+
+        // Calculate the "bend" in eyebrow line
+        val start = eyebrowPoints.first()
+        val middle = eyebrowPoints[eyebrowPoints.size / 2]
+        val end = eyebrowPoints.last()
+
+        // Calculate deviation from straight line
+        val straightLineY = start.y + (end.y - start.y) * 0.5f
+        val deviation = abs(middle.y - straightLineY)
+
+        return minOf(1f, deviation / 20f) // Normalize
+    }
+
+    private fun calculateJawTension(face: Face, faceContour: FaceContour?): Float {
+        return try {
+            var jawTension = 0f
+
+            // Method 1: Face width analysis at jaw level
+            faceContour?.points?.let { points ->
+                if (points.size >= 8) {
+                    val lowerPoints = points.takeLast(points.size / 3) // Lower third of face
+                    val jawWidth = calculateJawWidth(lowerPoints)
+
+                    // Wider jaw might indicate clenching
+                    if (jawWidth > 120f) { // Average jaw width threshold
+                        jawTension += ((jawWidth - 120f) / 40f) * 0.5f
+                    }
+                }
+            }
+
+            // Method 2: Head tilt indicating jaw tension
+            val headZ = abs(face.headEulerAngleZ)
+            if (headZ > 8f) {
+                jawTension += (headZ / 30f) * 0.3f
+            }
+
+            // Method 3: Mouth position relative to face
+            val mouthLeft = face.getLandmark(FaceLandmark.MOUTH_LEFT)
+            val mouthRight = face.getLandmark(FaceLandmark.MOUTH_RIGHT)
+
+            if (mouthLeft != null && mouthRight != null) {
+                val mouthWidth = abs(mouthRight.position.x - mouthLeft.position.x)
+                // Very narrow mouth might indicate jaw clenching
+                if (mouthWidth < 40f) {
+                    jawTension += (40f - mouthWidth) / 40f * 0.2f
+                }
+            }
+
+            maxOf(0f, minOf(1f, jawTension))
+        } catch (e: Exception) {
+            Log.e("FaceLandmark", "Error calculating jaw tension", e)
+            0f
+        }
+    }
+
+    private fun calculateJawWidth(lowerFacePoints: List<PointF>): Float {
+        if (lowerFacePoints.size < 4) return 0f
+
+        // Find leftmost and rightmost points in lower face
+        val leftmost = lowerFacePoints.minByOrNull { it.x }
+        val rightmost = lowerFacePoints.maxByOrNull { it.x }
+
+        return if (leftmost != null && rightmost != null) {
+            abs(rightmost.x - leftmost.x)
+        } else 0f
+    }
+
+    private fun estimateDarkCircles(face: Face, leftEyeContour: FaceContour?, rightEyeContour: FaceContour?): Float {
+        return try {
+            var darkCircleScore = 0f
+
+            // Method 1: Enhanced eye bag analysis
+            val eyeBagSeverity = estimateEyeBags(face, leftEyeContour, rightEyeContour)
+            darkCircleScore += eyeBagSeverity * 0.5f
+
+            // Method 2: Eye openness patterns (tired eyes)
+            val leftEyeOpen = face.leftEyeOpenProbability ?: 0.5f
+            val rightEyeOpen = face.rightEyeOpenProbability ?: 0.5f
+            val avgEyeOpen = (leftEyeOpen + rightEyeOpen) / 2f
+
+            // Very low eye openness suggests fatigue/dark circles
+            if (avgEyeOpen < 0.4f) {
+                darkCircleScore += (0.4f - avgEyeOpen) * 1.5f
+            }
+
+            // Method 3: Eye asymmetry (one eye more tired)
+            val eyeAsymmetry = abs(leftEyeOpen - rightEyeOpen)
+            if (eyeAsymmetry > 0.2f) {
+                darkCircleScore += eyeAsymmetry * 0.8f
+            }
+
+            maxOf(0f, minOf(1f, darkCircleScore))
+        } catch (e: Exception) {
+            Log.e("FaceLandmark", "Error estimating dark circles", e)
+            0f
+        }
+    }
+
+    private fun calculateSkinStressIndicators(face: Face): Float {
+        return try {
+            var skinStress = 0f
+
+            // Method 1: Overall facial tension patterns
+            val leftEyeOpen = face.leftEyeOpenProbability ?: 0.5f
+            val rightEyeOpen = face.rightEyeOpenProbability ?: 0.5f
+            val avgEyeOpen = (leftEyeOpen + rightEyeOpen) / 2f
+
+            // Squinting patterns indicate skin stress
+            if (avgEyeOpen < 0.5f) {
+                skinStress += (0.5f - avgEyeOpen) * 0.6f
+            }
+
+            // Method 2: Head positioning stress indicators
+            val headY = abs(face.headEulerAngleY)
+            val headX = abs(face.headEulerAngleX)
+
+            // Extreme head positions indicate stress posture
+            if (headY > 15f || headX > 10f) {
+                skinStress += ((headY + headX) / 50f) * 0.4f
+            }
+
+            maxOf(0f, minOf(1f, skinStress))
+        } catch (e: Exception) {
+            Log.e("FaceLandmark", "Error calculating skin stress", e)
+            0f
+        }
+    }
+
+    private fun calculateFacialAsymmetry(face: Face): Float {
+        return try {
+            var asymmetryScore = 0f
+
+            // Method 1: Eye asymmetry
+            val leftEyeOpen = face.leftEyeOpenProbability ?: 0.5f
+            val rightEyeOpen = face.rightEyeOpenProbability ?: 0.5f
+            val eyeAsymmetry = abs(leftEyeOpen - rightEyeOpen)
+            asymmetryScore += eyeAsymmetry * 0.4f
+
+            // Method 2: Landmark position asymmetry
+            val leftEye = face.getLandmark(FaceLandmark.LEFT_EYE)
+            val rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE)
+            val noseBase = face.getLandmark(FaceLandmark.NOSE_BASE)
+
+            if (leftEye != null && rightEye != null && noseBase != null) {
+                val faceCenter = noseBase.position.x
+                val leftDistance = abs(leftEye.position.x - faceCenter)
+                val rightDistance = abs(rightEye.position.x - faceCenter)
+                val positionAsymmetry = abs(leftDistance - rightDistance) / maxOf(leftDistance, rightDistance)
+
+                asymmetryScore += positionAsymmetry * 0.3f
+            }
+
+            // Method 3: Mouth asymmetry
+            val leftMouth = face.getLandmark(FaceLandmark.MOUTH_LEFT)
+            val rightMouth = face.getLandmark(FaceLandmark.MOUTH_RIGHT)
+            val bottomMouth = face.getLandmark(FaceLandmark.MOUTH_BOTTOM)
+
+            if (leftMouth != null && rightMouth != null && bottomMouth != null) {
+                val mouthCenter = (leftMouth.position.x + rightMouth.position.x) / 2f
+                val mouthCenterDeviation = abs(bottomMouth.position.x - mouthCenter)
+                asymmetryScore += (mouthCenterDeviation / 20f) * 0.3f
+            }
+
+            maxOf(0f, minOf(1f, asymmetryScore))
+        } catch (e: Exception) {
+            Log.e("FaceLandmark", "Error calculating facial asymmetry", e)
+            0f
+        }
     }
 
     interface LandmarkListener {

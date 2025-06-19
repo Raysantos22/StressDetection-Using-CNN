@@ -129,142 +129,101 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     private fun drawDetailedLandmarks(canvas: Canvas, boundingBox: BoundingBox, landmarks: FaceLandmarks) {
+        // Draw face contour landmarks like in the image - yellow dots
+        drawFaceContourLandmarks(canvas, landmarks)
+
+        // Draw stress level indicator
         val faceLeft = boundingBox.x1 * width
         val faceTop = boundingBox.y1 * height
         val faceRight = boundingBox.x2 * width
         val faceBottom = boundingBox.y2 * height
-
-        // Draw actual landmark points
-        drawLandmarkPoints(canvas, landmarks)
-
-        // Draw eye openness indicators
-        drawEyeIndicators(canvas, landmarks)
-
-        // Draw tension indicators
-        drawTensionIndicators(canvas, landmarks, faceLeft, faceTop, faceRight, faceBottom)
-
-        // Draw stress level indicator on face
         drawStressIndicator(canvas, landmarks, faceLeft, faceTop, faceRight, faceBottom)
     }
 
-    private fun drawLandmarkPoints(canvas: Canvas, landmarks: FaceLandmarks) {
+    private fun drawFaceContourLandmarks(canvas: Canvas, landmarks: FaceLandmarks) {
+        // Draw yellow dots like in the reference image
+        val dotPaint = Paint().apply {
+            color = Color.YELLOW
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+
+        val dotRadius = 6f
+
+        // Draw landmark points as yellow dots
         landmarks.landmarkPoints.forEach { (landmarkName, point) ->
             val x = point.x * width
             val y = point.y * height
 
             when (landmarkName) {
                 "LEFT_EYE", "RIGHT_EYE" -> {
-                    // Draw eye landmarks with openness indication
-                    val eyeOpenness = if (landmarkName == "LEFT_EYE") landmarks.leftEyeOpenness else landmarks.rightEyeOpenness
-                    eyePaint.color = when {
-                        eyeOpenness > 0.7f -> Color.GREEN
-                        eyeOpenness > 0.4f -> Color.YELLOW
-                        else -> Color.RED
-                    }
-                    val radius = 8f + (eyeOpenness * 8f)
-                    canvas.drawCircle(x, y, radius, eyePaint)
-
-                    // Draw smaller center point
-                    landmarkPaint.color = Color.WHITE
-                    canvas.drawCircle(x, y, 3f, landmarkPaint)
+                    // Draw multiple dots around eyes
+                    drawEyeContourDots(canvas, x, y, dotPaint, dotRadius)
                 }
                 "NOSE_BASE" -> {
-                    landmarkPaint.color = Color.BLUE
-                    canvas.drawCircle(x, y, 6f, landmarkPaint)
+                    // Draw nose dots
+                    canvas.drawCircle(x, y, dotRadius, dotPaint)
+                    canvas.drawCircle(x - 10, y - 5, dotRadius, dotPaint)
+                    canvas.drawCircle(x + 10, y - 5, dotRadius, dotPaint)
                 }
                 "MOUTH_LEFT", "MOUTH_RIGHT", "MOUTH_BOTTOM" -> {
-                    // Color mouth based on tension
-                    val color = when {
-                        landmarks.mouthTension > 0.6f -> Color.RED
-                        landmarks.mouthTension > 0.3f -> Color.YELLOW
-                        else -> Color.GREEN
-                    }
-                    landmarkPaint.color = color
-                    canvas.drawCircle(x, y, 5f, landmarkPaint)
+                    canvas.drawCircle(x, y, dotRadius, dotPaint)
                 }
                 "LEFT_EYEBROW", "RIGHT_EYEBROW" -> {
-                    // Color eyebrows based on tension
-                    val color = when {
-                        landmarks.eyebrowTension > 0.6f -> Color.RED
-                        landmarks.eyebrowTension > 0.3f -> Color.YELLOW
-                        else -> Color.GREEN
-                    }
-                    eyebrowPaint.color = color
-                    canvas.drawCircle(x, y, 4f, eyebrowPaint)
-
-                    // Draw tension line
-                    if (landmarks.eyebrowTension > 0.3f) {
-                        canvas.drawLine(x - 15, y, x + 15, y, eyebrowPaint)
-                    }
+                    // Draw eyebrow dots
+                    drawEyebrowContourDots(canvas, x, y, dotPaint, dotRadius)
                 }
             }
         }
+
+        // Draw additional face contour dots if we have enough landmark data
+        drawFaceOutlineDots(canvas, landmarks, dotPaint, dotRadius)
     }
 
-    private fun drawEyeIndicators(canvas: Canvas, landmarks: FaceLandmarks) {
-        // Draw eye bag severity indicators
-        if (landmarks.eyeBagSeverity > 0.3f) {
-            landmarks.landmarkPoints["LEFT_EYE"]?.let { leftEye ->
-                val x = leftEye.x * width
-                val y = leftEye.y * height + 20f
-
-                landmarkPaint.color = when {
-                    landmarks.eyeBagSeverity > 0.7f -> Color.RED
-                    landmarks.eyeBagSeverity > 0.5f -> Color.YELLOW
-                    else -> Color.YELLOW
-                }
-                canvas.drawCircle(x, y, 4f, landmarkPaint)
-            }
-
-            landmarks.landmarkPoints["RIGHT_EYE"]?.let { rightEye ->
-                val x = rightEye.x * width
-                val y = rightEye.y * height + 20f
-
-                landmarkPaint.color = when {
-                    landmarks.eyeBagSeverity > 0.7f -> Color.RED
-                    landmarks.eyeBagSeverity > 0.5f -> Color.YELLOW
-                    else -> Color.YELLOW
-                }
-                canvas.drawCircle(x, y, 4f, landmarkPaint)
-            }
-        }
+    private fun drawEyeContourDots(canvas: Canvas, centerX: Float, centerY: Float, paint: Paint, radius: Float) {
+        // Draw dots around eye area like in the image
+        canvas.drawCircle(centerX, centerY, radius, paint) // center
+        canvas.drawCircle(centerX - 15, centerY, radius, paint) // left
+        canvas.drawCircle(centerX + 15, centerY, radius, paint) // right
+        canvas.drawCircle(centerX - 10, centerY - 8, radius, paint) // top left
+        canvas.drawCircle(centerX + 10, centerY - 8, radius, paint) // top right
+        canvas.drawCircle(centerX - 10, centerY + 8, radius, paint) // bottom left
+        canvas.drawCircle(centerX + 10, centerY + 8, radius, paint) // bottom right
+        canvas.drawCircle(centerX, centerY - 10, radius, paint) // top
+        canvas.drawCircle(centerX, centerY + 10, radius, paint) // bottom
     }
 
-    private fun drawTensionIndicators(canvas: Canvas, landmarks: FaceLandmarks,
-                                      faceLeft: Float, faceTop: Float, faceRight: Float, faceBottom: Float) {
+    private fun drawEyebrowContourDots(canvas: Canvas, centerX: Float, centerY: Float, paint: Paint, radius: Float) {
+        // Draw eyebrow dots
+        canvas.drawCircle(centerX - 20, centerY, radius, paint)
+        canvas.drawCircle(centerX - 10, centerY - 3, radius, paint)
+        canvas.drawCircle(centerX, centerY - 5, radius, paint)
+        canvas.drawCircle(centerX + 10, centerY - 3, radius, paint)
+        canvas.drawCircle(centerX + 20, centerY, radius, paint)
+    }
 
-        // Draw mouth tension line
-        if (landmarks.mouthTension > 0.4f) {
-            landmarks.landmarkPoints["MOUTH_LEFT"]?.let { leftMouth ->
-                landmarks.landmarkPoints["MOUTH_RIGHT"]?.let { rightMouth ->
-                    val leftX = leftMouth.x * width
-                    val leftY = leftMouth.y * height
-                    val rightX = rightMouth.x * width
-                    val rightY = rightMouth.y * height
+    private fun drawFaceOutlineDots(canvas: Canvas, landmarks: FaceLandmarks, paint: Paint, radius: Float) {
+        // Create face outline dots based on available landmarks
+        val leftEye = landmarks.landmarkPoints["LEFT_EYE"]
+        val rightEye = landmarks.landmarkPoints["RIGHT_EYE"]
+        val noseBase = landmarks.landmarkPoints["NOSE_BASE"]
+        val mouthLeft = landmarks.landmarkPoints["MOUTH_LEFT"]
+        val mouthRight = landmarks.landmarkPoints["MOUTH_RIGHT"]
 
-                    mouthPaint.color = if (landmarks.mouthTension > 0.7f) Color.RED else Color.YELLOW
-                    canvas.drawLine(leftX, leftY, rightX, rightY, mouthPaint)
-                }
+        if (leftEye != null && rightEye != null && noseBase != null) {
+            val faceWidth = (rightEye.x - leftEye.x) * width * 1.8f
+            val faceHeight = faceWidth * 1.3f
+            val centerX = (leftEye.x + rightEye.x) * width / 2f
+            val centerY = (leftEye.y * height + noseBase.y * height) / 2f
+
+            // Draw oval face outline dots
+            val numDots = 20
+            for (i in 0 until numDots) {
+                val angle = (i * 2 * Math.PI / numDots).toFloat()
+                val x = centerX + (faceWidth / 2f * Math.cos(angle.toDouble())).toFloat()
+                val y = centerY + (faceHeight / 2f * Math.sin(angle.toDouble())).toFloat()
+                canvas.drawCircle(x, y, radius, paint)
             }
-        }
-
-        // Draw overall tension frame
-        if (landmarks.overallFacialTension > 0.5f) {
-            tensionPaint.color = when {
-                landmarks.overallFacialTension > 0.8f -> Color.RED
-                landmarks.overallFacialTension > 0.6f -> Color.YELLOW
-                else -> Color.YELLOW
-            }
-            tensionPaint.strokeWidth = 6f + (landmarks.overallFacialTension * 6f)
-
-            val padding = 10f
-            canvas.drawRect(
-                faceLeft + padding,
-                faceTop + padding,
-                faceRight - padding,
-                faceBottom - padding,
-                tensionPaint
-            )
         }
     }
 
@@ -276,7 +235,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
         if (stressLevel > 0) {
             val centerX = (faceLeft + faceRight) / 2
-            val indicatorY = faceTop - 20f
+            val indicatorY = faceTop - 30f
 
             val stressText = when (stressLevel) {
                 1 -> "😌"
