@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shadow layer (simulated elevation) -->
+
+
+    <!-- Main circular background slightly inset to create elevation effect -->
+    <item android:top="2dp" android:bottom="2dp" android:left="2dp" android:right="2dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/primary_blue" />
+        </shape>
+    </item>
+
+    <!-- Arrow icon centered -->
+    <item android:drawable="@drawable/baseline_navigate_next_24"
+        android:gravity="center" />
+
+</layer-list>

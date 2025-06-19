@@ -1,545 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5CBBCB"
+    android:background="#000000"
     tools:context=".MainActivity">
 
-    <!-- Main Container with rounded corners -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="12dp"
-        app:cardCornerRadius="24dp"
-        app:cardBackgroundColor="#333333"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <!-- Camera Preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <!-- View Signs Button (New) -->
-            <LinearLayout
-                android:id="@+id/topControlsSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:gravity="end"
-                android:background="#80000000">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#5CBBCB"
-                    app:cardElevation="0dp">
-
-                    <Button
-                        android:id="@+id/viewSignsButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="View All Signs"
-                        android:textSize="12sp"
-                        android:textColor="#000000"
-                        android:textStyle="bold"
-                        android:background="@android:color/transparent"
-                        android:stateListAnimator="@null"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"/>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-
-            <!-- Camera Preview Area -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="4"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#000000"
-                app:cardElevation="0dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <androidx.camera.view.PreviewView
-                        android:id="@+id/viewFinder"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                    <com.StressDetection.OverlayView
-                        android:id="@+id/overlay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                    <!-- Camera Flip Button -->
-                    <ImageButton
-                        android:id="@+id/flipCameraButton"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_margin="16dp"
-                        android:src="@android:drawable/ic_menu_camera"
-                        android:background="@android:color/transparent"
-                        android:tint="#FFFFFF"
-                        android:contentDescription="Flip Camera"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.8"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#222222"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <!-- Detected Sign -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="8dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="DETECTED SIGN"
-                            android:textColor="#AAAAAA"
-                            android:textSize="12sp"
-                            android:gravity="center"/>
-
-                        <TextView
-                            android:id="@+id/detectedSignText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="NONE"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:gravity="center"/>
-                    </LinearLayout>
-
-                    <!-- Vertical Divider -->
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="#444444"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <!-- Emotion -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="8dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="EMOTION"
-                            android:textColor="#AAAAAA"
-                            android:textSize="12sp"
-                            android:gravity="center"/>
-
-                        <TextView
-                            android:id="@+id/currentEmotionText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="NONE"
-                            android:textColor="#FFC107"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:gravity="center"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-            <!-- Word Display Area -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#444444"
-                app:cardElevation="0dp">
-
-                <TextView
-                    android:id="@+id/currentWordText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="Word:"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp" />
-            </androidx.cardview.widget.CardView>
-
-            <!-- Button Area -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-
-                    <!-- Clear Word Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        app:cardCornerRadius="24dp"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/clearWordButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="CLEAR WORD"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:background="@android:color/transparent"
-                            android:stateListAnimator="@null"/>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Clear Emotion Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        app:cardCornerRadius="24dp"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/clearEmotionButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="CLEAR EMOTION"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:textSize="12sp"
-                            android:background="@android:color/transparent"
-                            android:stateListAnimator="@null"/>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-                <!-- Space and Speak Buttons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <!-- Space Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        app:cardCornerRadius="24dp"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/spaceButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="SPACE"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:background="@android:color/transparent"
-                            android:stateListAnimator="@null"/>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Speak Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        app:cardCornerRadius="24dp"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/speakButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="SPEAK"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:background="@android:color/transparent"
-                            android:stateListAnimator="@null"/>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-
-                <!-- Capture Button & Clear Buttons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <!-- Capture Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/captureButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:alpha="0.5"
-                            android:background="@android:color/transparent"
-                            android:enabled="false"
-                            android:stateListAnimator="@null"
-                            android:text="CAPTURE"
-                            android:textColor="#000000"
-                            android:textStyle="bold" />
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Start Scanning Button -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="#5CBBCB"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
-
-                        <Button
-                            android:id="@+id/startScanningButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@android:color/transparent"
-                            android:stateListAnimator="@null"
-                            android:text="START"
-                            android:textColor="#000000"
-                            android:textStyle="bold" />
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Hidden but necessary elements -->
-    <TextView
-        android:id="@+id/captureConfirmationText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Captured: "
-        android:textColor="#4CAF50"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/scanningStatusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ready to scan"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/inferenceTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0ms"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:id="@+id/handSignIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:id="@+id/faceEmotionIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- Keep these for compatibility -->
-    <TextView
-        android:id="@+id/debugText"
+    <!-- Overlay for drawing bounding boxes and landmarks -->
+    <com.StressDetection.OverlayView
+        android:id="@+id/overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/toggleDebugButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <Button
-        android:id="@+id/modelInfoButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/inferenceTimeDisplay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- Other hidden elements for compatibility -->
+    <!-- Control Panel -->
     <LinearLayout
-        android:id="@+id/cameraControlsPanel"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <LinearLayout
-        android:id="@+id/debugControlsSection"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <androidx.cardview.widget.CardView
         android:id="@+id/controlPanel"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="wrap_content"
+        android:background="#CC000000"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <TextView
-        android:id="@+id/modeDescription"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Inference Time Display -->
+        <TextView
+            android:id="@+id/inferenceTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Initializing..."
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
 
-    <Button
-        android:id="@+id/toggleModeButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Stress Level Background -->
+        <LinearLayout
+            android:id="@+id/stressIndicatorBackground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="#555555"
+            android:orientation="vertical"
+            android:padding="12dp">
 
-    <Button
-        android:id="@+id/captureSignButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <!-- Main Stress Level -->
+            <TextView
+                android:id="@+id/stressLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Stress Level: Monitoring..."
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/captureEmotionButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <!-- Stress Indicator -->
+            <TextView
+                android:id="@+id/stressIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="📊 Position your face in camera"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/speak_word_button"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <!-- Detailed Stress Information -->
+            <TextView
+                android:id="@+id/stressDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Point camera at your face to begin analysis"
+                android:textAlignment="center"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp" />
 
-    <Button
-        android:id="@+id/speakEmotionButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/emotionHistoryText"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Capture Status -->
+        <TextView
+            android:id="@+id/captureStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="#FF4444"
+            android:padding="8dp"
+            android:text="Capturing... Please stay still"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/emotionTitle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Button Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
 
-    <Button
-        android:id="@+id/clearButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <!-- Capture Button -->
+            <Button
+                android:id="@+id/captureButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="#4CAF50"
+                android:enabled="false"
+                android:text="📸 Capture"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/isGpu"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <!-- Reset Button -->
+            <Button
+                android:id="@+id/resetButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="#FF9800"
+                android:text="🔄 Reset"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+            <!-- Resume Button -->
+            <Button
+                android:id="@+id/resumeButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="#2196F3"
+                android:text="▶️ Resume"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- View Results Button -->
+        <Button
+            android:id="@+id/viewResultsButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="#9C27B0"
+            android:text="📊 View Detailed Results"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

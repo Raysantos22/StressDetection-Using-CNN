@@ -1,0 +1,9 @@
+Angry
+Anxious
+Fear
+Happy
+Irritated
+Normal
+Overwhelmed
+Sad
+Worried
