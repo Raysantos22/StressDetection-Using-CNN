@@ -10,9 +10,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/skip_button_bg"
+        android:icon="@drawable/stresslogo"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/skip_button_bg"
+        android:roundIcon="@drawable/stresslogo"
         android:supportsRtl="true"
         android:theme="@style/Theme.StressDetection"
         tools:targetApi="31">
