@@ -1,231 +1,336 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#CC000000"
-    android:padding="16dp">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="8dp"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:minHeight="100dp">
+
+        <!-- Close Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:padding="8dp">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/closeButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:contentDescription="Close"
+                android:tint="#666666" />
+
+        </LinearLayout>
 
         <!-- Title Section -->
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#1E1E1E"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            app:cardElevation="8dp">
 
-            <TextView
-                android:id="@+id/dialogTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📊 Your Stress Analysis Results"
-                android:textAlignment="center"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/dialogTimestamp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Captured at 14:30:25"
-                android:textAlignment="center"
-                android:textColor="#CCFFFFFF"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <!-- Annotated Image Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#2E2E2E"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📸 Visual Analysis"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <ImageView
-                android:id="@+id/annotatedImage"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:scaleType="centerCrop"
-                android:background="#444444"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="👆 Arrows show stress indicators detected in your face"
-                android:textAlignment="center"
-                android:textColor="#AAFFFFFF"
-                android:textSize="12sp" />
-
-        </LinearLayout>
-
-        <!-- Results Summary -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#2E2E2E"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📊 Stress Level Analysis"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Stress Level Display -->
             <LinearLayout
-                android:id="@+id/stressLevelContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#4CAF50"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/stressEmoji"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/dialogTitle"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="😌"
-                    android:textSize="30sp"
-                    android:layout_marginEnd="12dp" />
+                    android:text="📊 Your Stress Analysis Results"
+                    android:textAlignment="center"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/dialogTimestamp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/stressLevelText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="LEVEL 1: LOW STRESS"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/stressScore"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Score: 18/100 points"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
+                    android:text="Captured at 14:30:25"
+                    android:textAlignment="center"
+                    android:textColor="#666666"
+                    android:textSize="16sp" />
 
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <!-- Detailed Breakdown -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📋 Detailed Breakdown:"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/emotionBreakdown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🎭 Emotions: 5/60 pts (Happy)\n😤 Facial Tension: 8/25 pts\n👁️ Eye Strain: 5/15 pts"
-                android:textColor="#CCFFFFFF"
-                android:textSize="12sp"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/confidenceLevel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📈 Analysis Confidence: 87%"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
-
-        </LinearLayout>
-
-        <!-- Why This Result Section -->
-        <LinearLayout
+        <!-- Annotated Image Section -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#2E2E2E"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            app:cardElevation="8dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="❓ Why This Result?"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/explanationText"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📸 Visual Analysis"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardBackgroundColor="#E9E9E9"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <ImageView
+                        android:id="@+id/annotatedImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="👆 Arrows show stress indicators detected in your face"
+                    android:textAlignment="center"
+                    android:textColor="#888888"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Results Summary -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="✅ LOW STRESS detected because:\n\n😊 Happy emotions reduce stress significantly\n• Facial muscles appear relaxed\n• Eyes show normal openness\n• Minimal tension detected\n\nKeep doing what you're doing! 🌟"
-                android:textColor="#CCFFFFFF"
-                android:textSize="13sp"
-                android:lineSpacingExtra="2dp" />
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Stress Level Analysis"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Stress Level Display -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/stressLevelContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="#4CAF50"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/stressEmoji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="😌"
+                            android:textSize="36sp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_gravity="center_vertical" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/stressLevelText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="LEVEL 1: LOW STRESS"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/stressScore"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Score: 18/100 points"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:layout_marginTop="4dp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Detailed Breakdown -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📋 Detailed Breakdown:"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:id="@+id/emotionBreakdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🎭 Emotions: 5/60 pts (Happy)\n😤 Facial Tension: 8/25 pts\n👁️ Eye Strain: 5/15 pts"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/confidenceLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📈 Analysis Confidence: 87%"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Why This Result Section -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="❓ Why This Result?"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/explanationText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✅ LOW STRESS detected because:\n\n😊 Happy emotions reduce stress significantly\n• Facial muscles appear relaxed\n• Eyes show normal openness\n• Minimal tension detected\n\nKeep doing what you're doing! 🌟"
+                    android:textColor="#666666"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginBottom="20dp"
             android:weightSum="2">
 
-            <Button
-                android:id="@+id/saveResultButton"
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:background="#FF9800"
-                android:text="💾 Save Result"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
+                app:cardBackgroundColor="#FF9800"
+                app:cardCornerRadius="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginStart="12dp"
+                app:cardElevation="6dp">
 
-            <Button
-                android:id="@+id/takeAnotherButton"
+                <Button
+                    android:id="@+id/saveResultButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@android:color/transparent"
+                    android:text="💾 Save Result"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:background="#4CAF50"
-                android:text="📸 Take Another"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
+                app:cardBackgroundColor="#4CAF50"
+                app:cardCornerRadius="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginStart="12dp"
+                app:cardElevation="6dp">
+
+                <Button
+                    android:id="@+id/takeAnotherButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@android:color/transparent"
+                    android:text="📸 Take Another"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 

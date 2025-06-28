@@ -302,13 +302,14 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
             visualAnalyzer.createAnnotatedResult(bitmap, result.stressAnalysis, result.landmarks)
         }
 
-        // Create custom dialog
+        // Create custom dialog view
         val dialogView = layoutInflater.inflate(R.layout.dialog_visual_result, null)
 
         // Setup dialog content
         setupDialogContent(dialogView, result, annotatedBitmap)
 
-        val dialog = AlertDialog.Builder(this)
+        // Create full-screen dialog
+        val dialog = AlertDialog.Builder(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
             .setView(dialogView)
             .setCancelable(true)
             .setOnCancelListener {
@@ -321,11 +322,21 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
 
         dialog.show()
 
-        // Make dialog take most of screen
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.85).toInt()
-        )
+        // Make dialog completely full screen
+        dialog.window?.apply {
+            setLayout(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            // Remove any window decorations
+            decorView.systemUiVisibility = (
+                    android.view.View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+            // Set status bar color to match dialog background
+            statusBarColor = android.graphics.Color.parseColor("#F5F5F5")
+        }
     }
 
     private fun setupDialogContent(
@@ -335,20 +346,47 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
     ) {
         val timeString = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(result.timestamp))
 
+        // Add close button at the top for better UX in full screen
+        val closeButton = dialogView.findViewById<ImageButton>(R.id.closeButton)
+        closeButton?.setOnClickListener {
+            // Find the parent dialog and dismiss it
+            val dialog = (dialogView.parent as? android.view.ViewGroup)?.let { parent ->
+                var current: android.view.View? = parent
+                while (current != null && current !is AlertDialog) {
+                    current = current.parent as? android.view.View
+                }
+                current as? AlertDialog
+            }
+            dialog?.dismiss()
+            autoResetAndResume()
+        }
+
         // Set timestamp
         dialogView.findViewById<TextView>(R.id.dialogTimestamp).text = "Captured at $timeString"
 
-        // Set annotated image
+        // Set annotated image with better scaling for full screen
         val annotatedImageView = dialogView.findViewById<ImageView>(R.id.annotatedImage)
         if (annotatedBitmap != null) {
             annotatedImageView.setImageBitmap(annotatedBitmap)
+            // Adjust image view for full screen
+            annotatedImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+            // Increase image height for full screen
+            val layoutParams = annotatedImageView.layoutParams
+            layoutParams.height = (resources.displayMetrics.heightPixels * 0.4).toInt()
+            annotatedImageView.layoutParams = layoutParams
         } else {
             // Fallback to original image
-            result.bitmap?.let { annotatedImageView.setImageBitmap(it) }
+            result.bitmap?.let {
+                annotatedImageView.setImageBitmap(it)
+                annotatedImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                val layoutParams = annotatedImageView.layoutParams
+                layoutParams.height = (resources.displayMetrics.heightPixels * 0.4).toInt()
+                annotatedImageView.layoutParams = layoutParams
+            }
         }
 
         // Set stress level container color and content
-        val stressContainer = dialogView.findViewById<LinearLayout>(R.id.stressLevelContainer)
+        val stressContainer = dialogView.findViewById<androidx.cardview.widget.CardView>(R.id.stressLevelContainer)
         val stressEmoji = dialogView.findViewById<TextView>(R.id.stressEmoji)
         val stressLevelText = dialogView.findViewById<TextView>(R.id.stressLevelText)
         val stressScore = dialogView.findViewById<TextView>(R.id.stressScore)
@@ -365,21 +403,51 @@ class MainActivity : AppCompatActivity(), Detector.DetectorListener, FaceLandmar
         stressLevelText.text = "LEVEL ${result.stressAnalysis.level}: ${getStressLevelText(result.stressAnalysis.level).uppercase()} STRESS"
         stressScore.text = "Score: ${result.stressAnalysis.score}/100 points"
 
-        // Set breakdown
+        // Increase text sizes for full screen
+        stressEmoji.textSize = 36f
+        stressLevelText.textSize = 20f
+        stressScore.textSize = 16f
+
+        // Set breakdown with larger text
         val emotionBreakdown = dialogView.findViewById<TextView>(R.id.emotionBreakdown)
-        emotionBreakdown.text = buildString {
-            append("🎭 Emotions: ${result.stressAnalysis.emotionScore}/60 pts (${result.stressAnalysis.dominantEmotion})\n")
-            append("😤 Facial Tension: ${result.stressAnalysis.facialTensionScore}/25 pts\n")
-            append("👁️ Eye Strain: ${result.stressAnalysis.eyeFatigueScore}/15 pts")
+        emotionBreakdown.apply {
+            text = buildString {
+                append("🎭 Emotions: ${result.stressAnalysis.emotionScore}/60 pts (${result.stressAnalysis.dominantEmotion})\n")
+                append("😤 Facial Tension: ${result.stressAnalysis.facialTensionScore}/25 pts\n")
+                append("👁️ Eye Strain: ${result.stressAnalysis.eyeFatigueScore}/15 pts")
+            }
+            textSize = 14f
         }
 
-        // Set confidence
+        // Set confidence with larger text
         val confidenceLevel = dialogView.findViewById<TextView>(R.id.confidenceLevel)
-        confidenceLevel.text = "📈 Analysis Confidence: ${getReliabilityScore()}%"
+        confidenceLevel.apply {
+            text = "📈 Analysis Confidence: ${getReliabilityScore()}%"
+            textSize = 14f
+        }
 
-        // Set explanation
+        // Set explanation with larger text
         val explanationText = dialogView.findViewById<TextView>(R.id.explanationText)
-        explanationText.text = getStressExplanation(result.stressAnalysis)
+        explanationText.apply {
+            text = getStressExplanation(result.stressAnalysis)
+            textSize = 15f
+            // Add more line spacing for better readability in full screen
+            setLineSpacing(6f, 1.2f)
+        }
+
+        // Adjust button sizes for full screen
+        val saveButton = dialogView.findViewById<Button>(R.id.saveResultButton)
+        val takeAnotherButton = dialogView.findViewById<Button>(R.id.takeAnotherButton)
+
+        saveButton?.apply {
+            textSize = 16f
+            layoutParams.height = (60 * resources.displayMetrics.density).toInt()
+        }
+
+        takeAnotherButton?.apply {
+            textSize = 16f
+            layoutParams.height = (60 * resources.displayMetrics.density).toInt()
+        }
     }
 
     private fun setupDialogButtons(dialogView: View, result: CaptureResult, dialog: AlertDialog) {

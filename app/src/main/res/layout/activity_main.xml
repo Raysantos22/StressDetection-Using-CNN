@@ -4,144 +4,279 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@drawable/gradient_background"
     tools:context=".MainActivity">
 
-    <!-- Camera Preview -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
+    <!-- Main Card Container -->
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/mainCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
-
-        <com.StressDetection.FaceGuideOverlay
-            android:id="@+id/faceGuide"
-            android:layout_width="0dp"
-            android:layout_height="0dp" />
-    </androidx.camera.view.PreviewView>
-
-    <!-- Overlay for drawing bounding boxes and landmarks -->
-    <com.StressDetection.OverlayView
-        android:id="@+id/overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/controlPanel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Face Guide Overlay -->
-
-    <!-- Control Panel -->
-    <LinearLayout
-        android:id="@+id/controlPanel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#CC000000"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="16dp"
+        app:cardBackgroundColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Inference Time Display -->
-        <TextView
-            android:id="@+id/inferenceTime"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Initializing..."
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            android:layout_height="match_parent"
+            android:padding="20dp">
 
-        <!-- Stress Level Background -->
-        <LinearLayout
-            android:id="@+id/stressIndicatorBackground"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:background="#555555"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Main Stress Level -->
+            <!-- Header Section -->
             <TextView
-                android:id="@+id/stressLevel"
-                android:layout_width="match_parent"
+                android:id="@+id/headerTitle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Stress Level: Monitoring..."
+                android:text="Stress Detection"
                 android:textAlignment="center"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textColor="#2C3E50"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Stress Indicator -->
             <TextView
-                android:id="@+id/stressIndicator"
-                android:layout_width="match_parent"
+                android:id="@+id/headerSubtitle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="📊 Position your face in camera"
+                android:text="Position your face in the camera"
                 android:textAlignment="center"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <!-- Capture Status -->
-        <TextView
-            android:id="@+id/captureStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="#FF4444"
-            android:padding="8dp"
-            android:text="Capturing... Please stay still"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <!-- Button Container -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <!-- Capture Button -->
-            <Button
-                android:id="@+id/captureButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:background="#4CAF50"
-                android:enabled="false"
-                android:text="📸 Capture Analysis"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp" />
-
-            <!-- Resume Button -->
-            <Button
-                android:id="@+id/resumeButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1"
-                android:background="#2196F3"
-                android:text="▶️ Resume"
-                android:textColor="#FFFFFF"
+                android:textColor="#7F8C8D"
                 android:textSize="14sp"
-                android:visibility="gone" />
+                android:layout_marginTop="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerTitle" />
 
-        </LinearLayout>
+            <!-- Camera Preview Container -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cameraCard"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="#000000"
+                app:layout_constraintBottom_toTopOf="@+id/statusCard"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerSubtitle">
 
-    </LinearLayout>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <!-- Camera Preview -->
+                    <androidx.camera.view.PreviewView
+                        android:id="@+id/viewFinder"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.StressDetection.FaceGuideOverlay
+                            android:id="@+id/faceGuide"
+                            android:layout_width="match_parent"
+                            android:visibility="gone"
+                            android:layout_height="match_parent" />
+                    </androidx.camera.view.PreviewView>
+
+                    <!-- Overlay for drawing bounding boxes and landmarks -->
+                    <com.StressDetection.OverlayView
+                        android:id="@+id/overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <!-- Face Guide Oval -->
+                    <View
+                        android:id="@+id/faceGuideOval"
+                        android:layout_width="200dp"
+                        android:layout_height="280dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Status Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statusCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                app:cardBackgroundColor="#F8F9FA"
+                app:layout_constraintBottom_toTopOf="@+id/buttonContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/stressIndicatorBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Stress Level Display -->
+                    <TextView
+                        android:id="@+id/stressLevel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Stress Level: Monitoring..."
+                        android:textAlignment="center"
+                        android:textColor="#2C3E50"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Stress Indicator -->
+                    <TextView
+                        android:id="@+id/stressIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📊 Position your face in camera"
+                        android:textAlignment="center"
+                        android:textColor="#7F8C8D"
+                        android:textSize="12sp" />
+
+                    <!-- Inference Time -->
+                    <TextView
+                        android:id="@+id/inferenceTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Initializing..."
+                        android:textAlignment="center"
+                        android:textColor="#95A5A6"
+                        android:visibility="gone"
+                        android:textSize="12sp" />
+
+                    <!-- Capture Status -->
+                    <TextView
+                        android:id="@+id/captureStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:padding="12dp"
+                        android:text="Capturing... Please stay still"
+                        android:textAlignment="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Button Container -->
+            <LinearLayout
+                android:id="@+id/buttonContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="16dp"
+                android:padding="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <!-- Start Scanning Button -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="6dp"
+
+                    app:cardBackgroundColor="#6C63FF">
+
+                    <Button
+                        android:id="@+id/startScanButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:text="START SCANNING"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Capture Button -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="#95A5A6">
+
+                    <Button
+                        android:id="@+id/captureButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@android:color/transparent"
+                        android:enabled="false"
+                        android:text="CAPTURE"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- Resume Button (Hidden by default) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/resumeButtonCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#2196F3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <Button
+                    android:id="@+id/resumeButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:text="▶️ RESUME SCANNING"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
